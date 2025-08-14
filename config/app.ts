@@ -7,14 +7,11 @@ import { defineConfig } from '@adonisjs/core/http'
 export const appKey = new Secret(env.get('APP_KEY'))
 
 export const http = defineConfig({
-  host: (env.get('HOST') || '0.0.0.0') as string,
-  port: Number(env.get('PORT') || 3333),
-
   generateRequestId: true,
   allowMethodSpoofing: false,
   useAsyncLocalStorage: false,
 
-  // Conversión a booleano para TRUST_PROXY
+  // Si usas proxy/CDN y quieres confiar en X-Forwarded-*
   trustProxy: (env.get('TRUST_PROXY') || 'false') === 'true',
 
   cookie: {
