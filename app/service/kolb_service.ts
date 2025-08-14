@@ -55,18 +55,22 @@ export default class KolbService {
     return PreguntaEa.query().orderBy('idpregunta_ea', 'asc')
   }
 
-  /** Preguntas agrupadas por bloque (pregunta_escol) — versión robusta con SQL crudo */
+  /** Preguntas agrupadas por bloque (pregunta_escol) — usando raw SQL y cast para TS */
   async preguntasPorBloque() {
-    const { rows } = await db.rawQuery<{
+    type Row = {
       idpregunta_ea: number
       pregunta_ea: string
       pregunta_escol: string
       titulo: string | null
-    }>(`
+    }
+
+    const { rows } = (await db.rawQuery(
+      `
       SELECT idpregunta_ea, pregunta_ea, pregunta_escol, titulo
       FROM public.pregunta_ea
       ORDER BY pregunta_escol ASC, idpregunta_ea ASC
-    `)
+      `
+    )) as unknown as { rows: Row[] }
 
     type Bloque = {
       codigo: 'EC' | 'OR' | 'CA' | 'EA'
@@ -94,14 +98,15 @@ export default class KolbService {
   }
 
   // ===== Estudiantes =====
-  /** Insert directo para evitar desalineaciones de modelo/esquema */
   async crearEstudiante(data: { nombres_e: string; apellidos_e: string }) {
     const sql = `
       INSERT INTO public.estudiante (nombres_e, apellidos_e)
       VALUES (?, ?)
       RETURNING *
     `
-    const { rows } = await db.rawQuery(sql, [data.nombres_e, data.apellidos_e])
+    const { rows } = (await db.rawQuery(sql, [data.nombres_e, data.apellidos_e])) as unknown as {
+      rows: any[]
+    }
     return rows[0]
   }
 
@@ -124,7 +129,7 @@ export default class KolbService {
       ) lt on lt.idestudiante = e.idestudiante
       order by e.idestudiante
     `
-    const { rows } = await db.rawQuery(sql)
+    const { rows } = (await db.rawQuery(sql)) as unknown as { rows: any[] }
     return rows
   }
 
@@ -149,7 +154,9 @@ export default class KolbService {
       where e.idestudiante = ?
       limit 1
     `
-    const { rows } = await db.rawQuery(sql, [id_estudiante, id_estudiante])
+    const { rows } = (await db.rawQuery(sql, [id_estudiante, id_estudiante])) as unknown as {
+      rows: any[]
+    }
     return rows[0] ?? null
   }
 
