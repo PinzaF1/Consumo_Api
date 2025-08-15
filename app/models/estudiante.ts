@@ -16,7 +16,8 @@ export default class Testeaxe extends BaseModel {
 
   @column({columnName: "apellido"})
   declare apellidos_e: string
-  @column() declare fecha_presentacion: string // date
+
+  @column() declare fecha_presentacion: string 
   @column() declare estilo_aprendizaje: string | null
   @column() declare idestilos_aprendizaje: number | null
 
