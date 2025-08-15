@@ -13,14 +13,14 @@ export default defineConfig({
         user: env.get('DB_USER'),
         password: env.get('DB_PASSWORD'),
         database: env.get('DB_DATABASE'),
-        // ssl: env.get('DB_SSL', 'false') === 'true', // si lo usas en Render
+        ssl: env.get('DB_SSL', 'false') === 'true' ? { rejectUnauthorized: false } : false,
       },
-      // healthCheck: false, // ❌ quitarla si te marca error en tipos
       debug: false,
       migrations: {
         tableName: 'adonis_schema',
         naturalSort: true,
       },
+      pool: { min: 0, max: 5 }, 
     },
   },
 })
